@@ -698,6 +698,20 @@ $rightName =
         Add-Summary ("Failed to disable Microsoft FTP Service: {0}" -f $_.Exception.Message)
     }
 
+    # 18b) World Wide Web Publishing Service: disable
+    try {
+        $w3svc = Get-Service -Name 'W3SVC' -ErrorAction SilentlyContinue
+        if ($w3svc) {
+            Set-Service -Name $w3svc.Name -StartupType Disabled -ErrorAction Stop
+            Stop-Service -Name $w3svc.Name -Force -ErrorAction SilentlyContinue
+            Add-Summary 'World Wide Web Publishing Service (W3SVC) disabled and stopped.'
+        } else {
+            Add-Summary 'World Wide Web Publishing Service (W3SVC) not found on this system.'
+        }
+    } catch {
+        Add-Summary ("Failed to disable World Wide Web Publishing Service: {0}" -f $_.Exception.Message)
+    }
+
     # 19) Remote Desktop: ensure disabled
     try {
         New-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server' -Name 'fDenyTSConnections' -PropertyType DWord -Value 1 -Force | Out-Null
